@@ -3,6 +3,7 @@ import MyHello from './components/MyHello.vue'
 </script>
 
 <template>
-  <h1>Blog asdsda</h1>
-  <MyHello />
+  <div class="mb-40">
+    <MyHello title="Кроссовки Puma" :price="6500" is-added />
+  </div>
 </template>
