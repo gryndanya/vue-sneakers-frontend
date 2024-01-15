@@ -8,6 +8,7 @@ Frontend:
 - Composition API / Options API
 - ESLint
 - Prettier
+- Mokky.dev
 
 # vue-sneakers
 
