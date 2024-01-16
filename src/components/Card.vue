@@ -1,5 +1,8 @@
 <script setup>
-defineProps({
+import { inject } from 'vue'
+
+const props = defineProps({
+  id: Number,
   imageUrl: String,
   title: String,
   price: Number,
@@ -9,18 +12,28 @@ defineProps({
   onClickFavourite: Function
 })
 
+const addToFavourite = inject('addToFavourite')
+
+const onClickFavourite = () => {
+  const obj = {
+    parentId: props.id
+  }
+
+  addToFavourite(obj)
+}
 </script>
 
 <template>
   <div
     class="relative bg-white border border-slate-200 rounded-3xl p-8 cursor-pointer transition hover:-translate-y-2 hover:shadow-xl"
   >
-    <img 
-      :src="!isFavourite ? '/like-1.svg' : '/like-2.svg'" 
-      alt="Like 1" 
-      class="absolute top-8 left-8" 
-      @click="onClickFavourite"/>
-    
+    <img
+      :src="!isFavourite ? '/like-1.svg' : '/like-2.svg'"
+      alt="Like 1"
+      class="absolute top-8 left-8"
+      @click="onClickFavourite"
+    />
+
     <img :src="imageUrl" alt="Sneaker" />
 
     <p class="mt-2">{{ title }}</p>
@@ -31,10 +44,7 @@ defineProps({
         <span>{{ price }} $</span>
       </div>
 
-      <img 
-        :src="!isAdded ? '/plus.svg' : '/checked.svg'" 
-        alt="Plus" 
-        @click="onClickAdd"/>
+      <img :src="!isAdded ? '/plus.svg' : '/checked.svg'" alt="Plus" @click="onClickAdd" />
     </div>
   </div>
 </template>

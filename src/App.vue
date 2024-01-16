@@ -1,12 +1,12 @@
 <script setup>
-import { onMounted, ref, reactive, watch } from 'vue'
+import { onMounted, ref, reactive, watch, provide } from 'vue'
 import axios from 'axios'
+
 import Header from './components/Header.vue'
 import CardList from './components/CardList.vue'
 import Drawer from './components/Drawer.vue'
 
 const items = ref([])
-const favorites = ref([])
 
 const filters = reactive({
   sortBy: 'title',
@@ -21,26 +21,30 @@ const onChangeSearch = (e) => {
   filters.searchQuery = e.target.value
 }
 
-const fetchFavorites = async () => {
+const fetchFavourites = async () => {
   try {
-    const { data: favorites } = await axios.get(`https://3c0d2296a5b88a3d.mokky.dev/favorites`)
+    const { data: favourites } = await axios.get(`https://3c0d2296a5b88a3d.mokky.dev/favorites`)
 
     items.value = items.value.map((obj) => {
-      const favorite = favorites.find((favorite) => favorite.parentId === obj.id)
+      const favourite = favourites.find((favorite) => favorite.parentId === obj.id)
 
-      if (!favorite) {
+      if (!favourite) {
         return obj
       }
 
       return {
         ...obj,
         isFavourite: true,
-        favoriteId: favorite.id
+        favoriteId: favourite.id
       }
     })
   } catch (err) {
     console.log(err)
   }
+}
+
+const addToFavourite = async (item) => {
+  item.isFavourite = true
 }
 
 const fetchItems = async () => {
@@ -66,9 +70,11 @@ const fetchItems = async () => {
 
 onMounted(async () => {
   await fetchItems()
-  await fetchFavorites()
+  await fetchFavourites()
 })
 watch(filters, fetchItems)
+
+provide('addToFavourite', addToFavourite)
 </script>
 
 <template>

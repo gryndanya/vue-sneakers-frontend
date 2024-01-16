@@ -4,9 +4,6 @@ import Card from './Card.vue'
 defineProps({
   items: Array
 })
-const onClickAdd = () => {}
-
-const onClickFavourite = () => {}
 </script>
 
 <template>
@@ -14,13 +11,14 @@ const onClickFavourite = () => {}
     <Card
       v-for="item in items"
       :key="item.id"
+      :id="item.id"
       :image-url="item.imageUrl"
       :title="item.title"
       :price="item.price"
-      :is-added="false"
+      :is-added="item.isAdded"
+      :is-favourite="item.isFavourite"
       :on-click-add="onClickAdd"
-      :is-favourite="false"
-      :on-click-favourite="onClickFavourite"
+      :on-click-favourite=""
     />
   </div>
 </template>
