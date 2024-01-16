@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, reactive, watch } from 'vue'
+import { onMounted, ref, reactive, watch, provide } from 'vue'
 import axios from 'axios'
 
 import Header from './components/Header.vue'
@@ -7,6 +7,17 @@ import CardList from './components/CardList.vue'
 import Drawer from './components/Drawer.vue'
 
 const items = ref([])
+const cart = ref([])
+
+const drawerOpen = ref(false)
+
+const closeDrawer = () => {
+  drawerOpen.value = false
+}
+
+const openDrawer = () => {
+  drawerOpen.value = true
+}
 
 const filters = reactive({
   sortBy: 'title',
@@ -19,6 +30,14 @@ const onChangeSelect = (e) => {
 
 const onChangeSearch = (e) => {
   filters.searchQuery = e.target.value
+}
+
+const addToCart = (item) => {
+  if (!item.isAdded) {
+    cart.value.push(item)
+  } else {
+    cart.value.splice(cart.value.indexOf(item), 1)
+  }
 }
 
 const addToFavourite = async (item) => {
@@ -91,12 +110,17 @@ onMounted(async () => {
   await fetchFavourites()
 })
 watch(filters, fetchItems)
+
+provide('cartActions', {
+  openDrawer,
+  closeDrawer
+})
 </script>
 
 <template>
-  <!-- <Drawer /> -->
+  <Drawer v-if="drawerOpen" />
   <div class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14 mb-14">
-    <Header />
+    <Header @open-drawer="openDrawer" />
 
     <div class="p-10">
       <div class="flex justify-between items-center">
@@ -121,7 +145,7 @@ watch(filters, fetchItems)
       </div>
 
       <div class="mt-10">
-        <CardList :items="items" @addToFavourite="addToFavourite" />
+        <CardList :items="items" @add-to-favourite="addToFavourite" @add-to-cart="addToCart" />
       </div>
     </div>
   </div>
