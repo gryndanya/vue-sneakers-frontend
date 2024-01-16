@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, reactive, watch, provide } from 'vue'
+import { onMounted, ref, reactive, watch } from 'vue'
 import axios from 'axios'
 
 import Header from './components/Header.vue'
@@ -21,9 +21,30 @@ const onChangeSearch = (e) => {
   filters.searchQuery = e.target.value
 }
 
+const addToFavourite = async (item) => {
+  try {
+    if (!item.isFavourite) {
+      item.isFavourite = true
+      const obj = {
+        parentId: item.id
+      }
+
+      const { data } = await axios.post(`https://3c0d2296a5b88a3d.mokky.dev/favourites`, obj)
+
+      item.favouriteId = data.id
+    } else {
+      item.isFavourite = false
+      await axios.delete(`https://3c0d2296a5b88a3d.mokky.dev/favourites/${item.favouriteId}`)
+      item.favouriteId = null
+    }
+  } catch (err) {
+    console.log(err)
+  }
+}
+
 const fetchFavourites = async () => {
   try {
-    const { data: favourites } = await axios.get(`https://3c0d2296a5b88a3d.mokky.dev/favorites`)
+    const { data: favourites } = await axios.get(`https://3c0d2296a5b88a3d.mokky.dev/favourites`)
 
     items.value = items.value.map((obj) => {
       const favourite = favourites.find((favorite) => favorite.parentId === obj.id)
@@ -43,10 +64,6 @@ const fetchFavourites = async () => {
   }
 }
 
-const addToFavourite = async (item) => {
-  item.isFavourite = true
-}
-
 const fetchItems = async () => {
   try {
     const params = {
@@ -61,7 +78,8 @@ const fetchItems = async () => {
     items.value = data.map((obj) => ({
       ...obj,
       isFavourite: false,
-      isAdded: false
+      isAdded: false,
+      favouriteId: null
     }))
   } catch (err) {
     console.log(err)
@@ -73,8 +91,6 @@ onMounted(async () => {
   await fetchFavourites()
 })
 watch(filters, fetchItems)
-
-provide('addToFavourite', addToFavourite)
 </script>
 
 <template>
@@ -105,7 +121,7 @@ provide('addToFavourite', addToFavourite)
       </div>
 
       <div class="mt-10">
-        <CardList :items="items" />
+        <CardList :items="items" @addToFavourite="addToFavourite" />
       </div>
     </div>
   </div>
